@@ -1,0 +1,25 @@
+library(DESeq2)
+
+data = read.table("/home/qiu/M_disk/qyf/rna-seq/4.DE_analysis/../3.Merge_result/genes.counts.matrix", header=T, row.names=1, com='')
+col_ordering = c(5,7,9,1,3,11)
+rnaseqMatrix = data[,col_ordering]
+rnaseqMatrix = round(rnaseqMatrix)
+rnaseqMatrix = rnaseqMatrix[rowSums(rnaseqMatrix)>=2,]
+conditions = data.frame(conditions=factor(c(rep("D309-CK-穗", 3), rep("D309-干旱-穗", 3))))
+rownames(conditions) = colnames(rnaseqMatrix)
+ddsFullCountTable <- DESeqDataSetFromMatrix(
+    countData = rnaseqMatrix,
+    colData = conditions,
+    design = ~ conditions)
+dds = DESeq(ddsFullCountTable)
+res = results(dds)
+baseMeanA <- rowMeans(counts(dds, normalized=TRUE)[,colData(dds)$condition == "D309-CK-穗"])
+baseMeanB <- rowMeans(counts(dds, normalized=TRUE)[,colData(dds)$condition == "D309-干旱-穗"])
+res = cbind(baseMeanA, baseMeanB, as.data.frame(res))
+res = cbind(id=rownames(res), as.data.frame(res))
+res$padj[is.na(res$padj)]  <- 1
+write.table(as.data.frame(res[order(res$pvalue),]), file='genes.counts.matrix.D309-CK-穗_vs_D309-干旱-穗.DESeq2.DE_results', sep='	', quote=FALSE, row.names=F)
+source("/home/qiu/anaconda3/opt/trinity-2.1.1/Analysis/DifferentialExpression/R/rnaseq_plot_funcs.R")
+pdf("genes.counts.matrix.D309-CK-穗_vs_D309-干旱-穗.DESeq2.DE_results.MA_n_Volcano.pdf")
+plot_MA_and_Volcano(log2(res$baseMean+1), res$log2FoldChange, res$padj)
+dev.off()
