@@ -1,0 +1,17 @@
+#BiocManager::install("plyr")
+#BiocManager::install("reshape2")
+library(plyr)
+library(reshape2)
+library(dplyr)
+library(rstatix)
+library(reshape2)
+qyf=read.table(file="XMPZ-CK-DR.txt",header=T,sep="\t",row.names=1)
+qyf=names(qyf)[1:(ncol(qyf)-1)]
+result=melt(qyf) %>%
+  group_by(variable) %>%
+  t_test(value ~ type, paired = TRUE) %>%
+  adjust_pvalue(method = "fdr") %>%
+  add_significance("p.adj")
+#????result
+result
+write.csv(result,file = "XMPZ-CK-DR.csv")
