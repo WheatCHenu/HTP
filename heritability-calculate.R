@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library(tidyverse)
 library(openxlsx)
-# re- read.xlsx ("167-top-遗传力计算x", sheet = 4, s1artRow = 1, colNames = TRUE, rowNames = FALSE)
+# re- read.xlsx ("1", sheet = 4, s1artRow = 1, colNames = TRUE, rowNames = FALSE)
 # wre.table(re,'top-dest',sep='\t',quote=F)
 ### blup estimates for phenotypic traits across multiple envionments##
 ### Broad-sense heritability estimation across multiple envionments
